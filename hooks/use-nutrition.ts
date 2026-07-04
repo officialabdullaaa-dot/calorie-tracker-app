@@ -1,23 +1,38 @@
 "use client";
 
 import { useEffect } from "react";
-import { useNutritionStore } from "@/store/nutrition-store";
-import { calculateHealthSummary } from "@/services/health/health-engine";
 
-export function useNutrition() {
-  const store = useNutritionStore();
+import { useNutritionStore } from "@/store/nutrition-store";
+
+export const useNutrition = () => {
+  const profile = useNutritionStore((state) => state.profile);
+  const dailyLog = useNutritionStore((state) => state.dailyLog);
+  const pendingMeal = useNutritionStore((state) => state.pendingMeal);
+
+  const hydrate = useNutritionStore((state) => state.hydrate);
+  const setProfile = useNutritionStore((state) => state.setProfile);
+  const updateWater = useNutritionStore((state) => state.updateWater);
+  const setPendingMeal = useNutritionStore((state) => state.setPendingMeal);
+
+  const addMeal = useNutritionStore((state) => state.addMeal);
+  const deleteMeal = useNutritionStore((state) => state.deleteMeal);
+  const clearDailyLog = useNutritionStore((state) => state.clearDailyLog);
 
   useEffect(() => {
-    store.hydrate();
-  }, []);
-
-  const health = calculateHealthSummary({
-    profile: store.profile,
-    dailyLog: store.dailyLog,
-  });
+    hydrate();
+  }, [hydrate]);
 
   return {
-    ...store,
-    ...health,
+    profile,
+    dailyLog,
+    pendingMeal,
+
+    setProfile,
+    updateWater,
+    setPendingMeal,
+
+    addMeal,
+    deleteMeal,
+    clearDailyLog,
   };
-}
+};

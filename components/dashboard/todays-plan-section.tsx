@@ -1,18 +1,54 @@
 "use client";
 
 import { Target } from "lucide-react";
+
 import { Card } from "@/components/ui/card";
 import { useNutrition } from "@/hooks/use-nutrition";
 
+const getNumber = (value: unknown, fallback = 0) => {
+  return typeof value === "number" && !Number.isNaN(value) ? value : fallback;
+};
+
 export function TodaysPlanSection() {
-  const {
-    caloriesRemaining,
-    proteinRemaining,
-    waterRemaining,
-    stepsRemaining,
-    dailyScore,
-    nextBestAction,
-  } = useNutrition();
+  const nutrition = useNutrition();
+
+  const dailyLog = nutrition.dailyLog as any;
+  const profile = nutrition.profile as any;
+
+  const caloriesGoal = getNumber(profile?.dailyCaloriesGoal, 2000);
+  const proteinGoal = getNumber(profile?.dailyProteinGoal, 120);
+  const waterGoal = getNumber(profile?.dailyWaterGoal, 8);
+  const stepsGoal = getNumber(profile?.dailyStepsGoal, 10000);
+
+  const caloriesConsumed = getNumber(dailyLog?.caloriesConsumed, 0);
+  const proteinConsumed = getNumber(dailyLog?.proteinConsumed, 0);
+  const waterIntake = getNumber(dailyLog?.waterIntake, 0);
+  const steps = getNumber(dailyLog?.steps, 0);
+
+  const caloriesRemaining = Math.max(0, caloriesGoal - caloriesConsumed);
+  const proteinRemaining = Math.max(0, proteinGoal - proteinConsumed);
+  const waterRemaining = Math.max(0, waterGoal - waterIntake);
+  const stepsRemaining = Math.max(0, stepsGoal - steps);
+
+  const completedGoals = [
+    caloriesRemaining === 0,
+    proteinRemaining === 0,
+    waterRemaining === 0,
+    stepsRemaining === 0,
+  ].filter(Boolean).length;
+
+  const dailyScore = Math.round((completedGoals / 4) * 100);
+
+  const nextBestAction =
+    caloriesRemaining > 0
+      ? "Log your next meal to stay on track."
+      : proteinRemaining > 0
+        ? "Add a protein-rich meal or snack."
+        : waterRemaining > 0
+          ? "Drink one more glass of water."
+          : stepsRemaining > 0
+            ? "Take a short walk to complete your steps."
+            : "Great job. You completed your daily plan.";
 
   return (
     <Card className="mt-5">
@@ -34,7 +70,7 @@ export function TodaysPlanSection() {
           </div>
 
           <div className="mt-4 space-y-2 text-sm text-brand-muted">
-            <p>🔥 {caloriesRemaining} kcal remaining</p>
+            <p>🔥 {caloriesRemaining.toLocaleString()} kcal remaining</p>
             <p>🍗 {Math.round(proteinRemaining)}g protein left</p>
             <p>💧 {waterRemaining} glasses water left</p>
             <p>🚶 {stepsRemaining.toLocaleString()} steps left</p>
