@@ -7,9 +7,12 @@ export function BottomNav() {
         <NavItem icon={<Home size={22} />} label="Home" active />
         <NavItem icon={<BarChart3 size={22} />} label="Analytics" />
 
-        <button className="flex h-16 w-16 -translate-y-5 items-center justify-center rounded-full bg-brand-primary text-white shadow-soft transition active:scale-95">
-          <Plus size={30} />
-        </button>
+        <a
+  href="/add-meal"
+  className="flex h-16 w-16 -translate-y-5 items-center justify-center rounded-full bg-brand-primary text-white shadow-soft transition active:scale-95"
+>
+  <Plus size={30} />
+</a>
 
         <NavItem icon={<Lightbulb size={22} />} label="Plan" />
         <NavItem icon={<Settings size={22} />} label="Settings" />
