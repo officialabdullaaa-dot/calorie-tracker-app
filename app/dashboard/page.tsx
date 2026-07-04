@@ -9,6 +9,7 @@ import { QuickActionsSection } from "@/components/dashboard/quick-actions-sectio
 import { WeeklyProgressSection } from "@/components/dashboard/weekly-progress-section";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { DateStrip } from "@/components/layout/date-strip";
+import { TodaysPlanSection } from "@/components/dashboard/todays-plan-section";
 
 export default function DashboardPage() {
   return (
@@ -18,6 +19,7 @@ export default function DashboardPage() {
         <DateStrip />
         <CaloriesSection />
         <MacrosSection />
+        <TodaysPlanSection />
         <DailyScoreSection />
         <MetricsSection />
         <MealsSection />

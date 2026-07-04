@@ -1,37 +1,64 @@
 "use client";
 
 import { create } from "zustand";
+
 import type { DailyLog, MealLog, UserProfile } from "@/types/nutrition";
+
 import { mockDailyLog, mockUserProfile } from "@/constants/mock-data";
-import { loadFromStorage, saveToStorage } from "@/services/storage.service";
+
+import { NutritionRepository } from "@/repositories/nutrition.repository";
 
 type NutritionState = {
   profile: UserProfile;
   dailyLog: DailyLog;
+
+  pendingMeal: MealLog | null;
+
   hydrate: () => void;
+  setPendingMeal: (meal: MealLog | null) => void;
   addMeal: (meal: MealLog) => void;
+  updateWater: (change: number) => void;
 };
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
   profile: mockUserProfile,
   dailyLog: mockDailyLog,
+  pendingMeal: null,
 
-  hydrate: () => {
-    const profile = loadFromStorage("profile", mockUserProfile);
-    const dailyLog = loadFromStorage("dailyLog", mockDailyLog);
-
-    set({ profile, dailyLog });
+  hydrate() {
+    set({
+      profile: NutritionRepository.loadProfile(),
+      dailyLog: NutritionRepository.loadDailyLog(),
+    });
   },
 
-  addMeal: (meal) => {
+  setPendingMeal(meal) {
+    set({ pendingMeal: meal });
+  },
+
+  addMeal(meal) {
+    const updatedDailyLog = {
+      ...get().dailyLog,
+      meals: [...get().dailyLog.meals, meal],
+    };
+
+    set({
+      dailyLog: updatedDailyLog,
+      pendingMeal: null,
+    });
+
+    NutritionRepository.saveDailyLog(updatedDailyLog);
+  },
+
+  updateWater(change) {
     const current = get().dailyLog;
 
     const updatedDailyLog = {
       ...current,
-      meals: [...current.meals, meal],
+      waterGlasses: Math.max(0, current.waterGlasses + change),
     };
 
     set({ dailyLog: updatedDailyLog });
-    saveToStorage("dailyLog", updatedDailyLog);
+    NutritionRepository.saveDailyLog(updatedDailyLog);
   },
 }));

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useNutritionStore } from "@/store/nutrition-store";
+import { calculateHealthSummary } from "@/services/health/health-engine";
 
 export function useNutrition() {
   const store = useNutritionStore();
@@ -10,32 +11,13 @@ export function useNutrition() {
     store.hydrate();
   }, []);
 
-  const caloriesConsumed = store.dailyLog.meals.reduce(
-    (total, meal) => total + meal.totalCalories,
-    0
-  );
-
-  const proteinConsumed = store.dailyLog.meals.reduce(
-    (total, meal) => total + meal.totalProtein,
-    0
-  );
-
-  const carbsConsumed = store.dailyLog.meals.reduce(
-    (total, meal) => total + meal.totalCarbs,
-    0
-  );
-
-  const fatConsumed = store.dailyLog.meals.reduce(
-    (total, meal) => total + meal.totalFat,
-    0
-  );
+  const health = calculateHealthSummary({
+    profile: store.profile,
+    dailyLog: store.dailyLog,
+  });
 
   return {
     ...store,
-    caloriesConsumed,
-    caloriesRemaining: store.profile.dailyCalorieGoal - caloriesConsumed,
-    proteinConsumed,
-    carbsConsumed,
-    fatConsumed,
+    ...health,
   };
 }
